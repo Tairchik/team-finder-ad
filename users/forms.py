@@ -50,6 +50,9 @@ class EditProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['name', 'surname', 'avatar', 'about', 'phone', 'github_url']
+        widgets = {
+            'avatar': forms.FileInput(),
+        }
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone', '')
