@@ -10,8 +10,8 @@ urlpatterns = [
     path('list/', views.participants_view, name='participants'),
     path('edit-profile/', views.edit_profile_view, name='edit_profile'),
     path('change-password/', views.change_password_view, name='change_password'),
-    path('skills/add/', views.add_skill_view, name='add_skill'),
-    path('skills/<int:skill_id>/delete/',
-         views.delete_skill_view, name='delete_skill'),
+    path('skills/', views.skills_autocomplete_view, name='skills_autocomplete'),
+    path('<int:user_id>/skills/add/', views.add_skill_view, name='add_skill'),
+    path('<int:user_id>/skills/<int:skill_id>/remove/', views.remove_skill_view, name='remove_skill'),
     path('<int:user_id>/', views.user_detail_view, name='user_detail'),
 ]

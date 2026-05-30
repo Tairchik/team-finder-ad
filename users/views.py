@@ -1,10 +1,12 @@
-from django.contrib.auth import login, logout, authenticate
+import json
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 
 from .forms import RegisterForm, LoginForm, EditProfileForm, ChangePasswordForm
-from .models import User, Skill
+from .models import User, Skill, SkillTag
 
 
 def register_view(request):
@@ -33,6 +35,12 @@ def logout_view(request):
 def user_detail_view(request, user_id):
     user = get_object_or_404(User, id=user_id)
     return render(request, 'users/user-details.html', {'user': user})
+
+
+def skills_autocomplete_view(request):
+    q = request.GET.get('q', '').strip()
+    tags = SkillTag.objects.filter(name__icontains=q)[:10] if q else []
+    return JsonResponse([{'id': t.id, 'name': t.name} for t in tags], safe=False)
 
 
 @login_required
@@ -92,16 +100,32 @@ def participants_view(request):
 
 
 @login_required
-def add_skill_view(request):
-    if request.method == 'POST':
-        name = request.POST.get('name', '').strip()
-        if name:
-            Skill.objects.create(user=request.user, name=name)
-    return redirect(f'/users/{request.user.id}/')
+def add_skill_view(request, user_id):
+    if request.user.id != user_id:
+        return JsonResponse({'error': 'forbidden'}, status=403)
+
+    data = json.loads(request.body)
+    skill_id = data.get('skill_id')
+    name = data.get('name', '').strip()
+
+    if skill_id:
+        tag = get_object_or_404(SkillTag, id=skill_id)
+    elif name:
+        tag, _ = SkillTag.objects.get_or_create(name=name)
+    else:
+        return JsonResponse({'error': 'no data'}, status=400)
+
+    # Не добавляем дубликат
+    if not Skill.objects.filter(user=request.user, name=tag.name).exists():
+        Skill.objects.create(user=request.user, name=tag.name)
+
+    return JsonResponse({'id': tag.id, 'name': tag.name})
 
 
 @login_required
-def delete_skill_view(request, skill_id):
+def remove_skill_view(request, user_id, skill_id):
+    if request.user.id != user_id:
+        return JsonResponse({'error': 'forbidden'}, status=403)
     skill = get_object_or_404(Skill, id=skill_id, user=request.user)
     skill.delete()
-    return redirect(f'/users/{request.user.id}/')
+    return JsonResponse({'status': 'ok'})
