@@ -90,4 +90,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         img.save(buffer, format='PNG')
         filename = f'avatar_{uuid.uuid4()}.png'
         return ContentFile(buffer.getvalue(), name=filename)
-
