@@ -70,7 +70,7 @@ def complete_project_view(request, project_id):
 def toggle_participate_view(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     user = request.user
-    if user == project.owner:
+    if user == project.owner or project.status == 'closed':
         return JsonResponse({'status': 'error'}, status=403)
     if user in project.participants.all():
         project.participants.remove(user)
@@ -78,7 +78,7 @@ def toggle_participate_view(request, project_id):
     else:
         project.participants.add(user)
         participating = True
-    return JsonResponse({'status': 'ok', 'participating': participating})
+    return JsonResponse({'status': 'ok', 'participant': participating})
 
 
 @login_required
