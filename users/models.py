@@ -20,7 +20,8 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('Email обязателен')
         email = self.normalize_email(email)
-        user = self.model(email=email, name=name, surname=surname, **extra_fields)
+        user = self.model(email=email, name=name,
+                          surname=surname, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -41,6 +42,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     about = models.TextField(blank=True, max_length=256)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+
+    favorites = models.ManyToManyField(
+        'projects.Project',
+        blank=True,
+        related_name='interested_users',
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name', 'surname']
@@ -66,7 +73,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         # Пробуем загрузить шрифт, если нет — используем дефолтный
         try:
-            font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 48)
+            font = ImageFont.truetype(
+                '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 48)
         except Exception:
             font = ImageFont.load_default()
 
@@ -85,7 +93,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Skill(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='skills')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='skills')
     name = models.CharField(max_length=100)
 
     def __str__(self):
