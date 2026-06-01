@@ -4,15 +4,16 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from core.constants import PROJECT_STATUS_CLOSED, PROJECT_STATUS_OPEN, PROJECTS_PER_PAGE
+from core.services import paginate
 from projects.forms import ProjectForm
 from projects.models import Project
 
 
 def project_list_view(request):
-    projects = Project.objects.order_by('-created_at')
-    paginator = Paginator(projects, 9)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    projects = Project.objects.select_related('owner').prefetch_related(
+        'participants').order_by('-created_at')
+    page_obj = paginate(projects, PROJECTS_PER_PAGE, request.GET.get('page'))
     return render(request, 'projects/project_list.html', {
         'page_obj': page_obj,
         'query_prefix': '',
@@ -20,7 +21,11 @@ def project_list_view(request):
 
 
 def project_detail_view(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
+    project = get_object_or_404(
+        Project.objects.select_related(
+            'owner').prefetch_related('participants'),
+        id=project_id,
+    )
     return render(request, 'projects/project-details.html', {'project': project})
 
 
@@ -58,11 +63,11 @@ def edit_project_view(request, project_id):
 @require_POST
 def complete_project_view(request, project_id):
     project = get_object_or_404(Project, id=project_id)
-    if request.user != project.owner or project.status != 'open':
+    if request.user != project.owner or project.status != PROJECT_STATUS_OPEN:
         return JsonResponse({'status': 'error'}, status=403)
-    project.status = 'closed'
+    project.status = PROJECT_STATUS_CLOSED
     project.save()
-    return JsonResponse({'status': 'ok', 'project_status': 'closed'})
+    return JsonResponse({'status': 'ok', 'project_status': PROJECT_STATUS_CLOSED})
 
 
 @login_required
@@ -70,7 +75,7 @@ def complete_project_view(request, project_id):
 def toggle_participate_view(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     user = request.user
-    if user == project.owner or project.status == 'closed':
+    if user == project.owner or project.status == PROJECT_STATUS_CLOSED:
         return JsonResponse({'status': 'error'}, status=403)
     if user in project.participants.all():
         project.participants.remove(user)
