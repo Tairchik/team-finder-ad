@@ -3,6 +3,7 @@ import re
 from django import forms
 from django.contrib.auth import authenticate
 
+from core.mixins import GithubUrlValidationMixin
 from users.models import User
 
 
@@ -46,7 +47,7 @@ class LoginForm(forms.Form):
         return cleaned_data
 
 
-class EditProfileForm(forms.ModelForm):
+class EditProfileForm(GithubUrlValidationMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = ['name', 'surname', 'avatar', 'about', 'phone', 'github_url']
@@ -74,12 +75,6 @@ class EditProfileForm(forms.ModelForm):
             raise forms.ValidationError('Этот номер телефона уже используется')
 
         return phone
-
-    def clean_github_url(self):
-        url = self.cleaned_data.get('github_url', '')
-        if url and 'github.com' not in url:
-            raise forms.ValidationError('Ссылка должна вести на GitHub')
-        return url
 
 
 class ChangePasswordForm(forms.Form):
