@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
+from core.constants import USERS_PER_PAGE
+from core.services import paginate
 from users.forms import ChangePasswordForm, EditProfileForm, LoginForm, RegisterForm
 from users.models import User
 
@@ -80,7 +82,7 @@ def participants_view(request):
 
     paginator = Paginator(users_qs, 12)
     page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = paginate(users_qs, USERS_PER_PAGE, request.GET.get('page'))
 
     query_prefix = f'filter={active_filter}&' if active_filter else ''
 
