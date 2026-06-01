@@ -4,12 +4,13 @@ from django import forms
 from django.contrib.auth import authenticate
 
 from core.mixins import GithubUrlValidationMixin
+from core.constants import USER_NAME_MAX_LENGTH, USER_SURNAME_MAX_LENGTH
 from users.models import User
 
 
 class RegisterForm(forms.Form):
-    name = forms.CharField(max_length=124)
-    surname = forms.CharField(max_length=124)
+    name = forms.CharField(max_length=USER_NAME_MAX_LENGTH)
+    surname = forms.CharField(max_length=USER_SURNAME_MAX_LENGTH)
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
 
