@@ -3,8 +3,8 @@ import re
 from django import forms
 from django.contrib.auth import authenticate
 
-from core.mixins import GithubUrlValidationMixin
 from core.constants import USER_NAME_MAX_LENGTH, USER_SURNAME_MAX_LENGTH
+from core.mixins import GithubUrlValidationMixin
 from users.models import User
 
 

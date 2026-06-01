@@ -12,12 +12,12 @@ from django.db import models
 from PIL import Image, ImageDraw, ImageFont
 
 from core.constants import (
+    AVATAR_COLORS,
+    AVATAR_SIZE,
     USER_ABOUT_MAX_LENGTH,
     USER_NAME_MAX_LENGTH,
     USER_PHONE_MAX_LENGTH,
     USER_SURNAME_MAX_LENGTH,
-    AVATAR_COLORS,
-    AVATAR_SIZE,
 )
 
 
