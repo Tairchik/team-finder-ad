@@ -2,11 +2,14 @@ import random
 import uuid
 from io import BytesIO
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.core.files.base import ContentFile
 from django.db import models
 from PIL import Image, ImageDraw, ImageFont
-
 
 AVATAR_COLORS = [
     '#5B8DEF', '#9B59B6', '#E67E22',
