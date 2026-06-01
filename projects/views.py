@@ -79,9 +79,8 @@ def toggle_participate_view(request, project_id):
     user = request.user
     if user == project.owner or project.status == PROJECT_STATUS_CLOSED:
         return JsonResponse({'status': 'error'}, status=HTTPStatus.FORBIDDEN)
-    if user in project.participants.all():
+    if is_participant := project.participants.filter(pk=user.pk).exists():
         project.participants.remove(user)
-        participating = False
     else:
         project.participants.add(user)
         participating = True
@@ -93,9 +92,8 @@ def toggle_participate_view(request, project_id):
 def toggle_favorite_view(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     user = request.user
-    if project in user.favorites.all():
+    if is_favorite := user.favorites.filter(pk=project.pk).exists():
         user.favorites.remove(project)
-        is_favorite = False
     else:
         user.favorites.add(project)
         is_favorite = True
