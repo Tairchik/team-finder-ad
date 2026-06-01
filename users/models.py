@@ -11,6 +11,13 @@ from django.core.files.base import ContentFile
 from django.db import models
 from PIL import Image, ImageDraw, ImageFont
 
+from core.constants import (
+    USER_ABOUT_MAX_LENGTH,
+    USER_NAME_MAX_LENGTH,
+    USER_PHONE_MAX_LENGTH,
+    USER_SURNAME_MAX_LENGTH,
+)
+
 AVATAR_COLORS = [
     '#5B8DEF', '#9B59B6', '#E67E22',
     '#27AE60', '#E74C3C', '#16A085',
@@ -37,12 +44,12 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    name = models.CharField(max_length=124)
-    surname = models.CharField(max_length=124)
+    name = models.CharField(max_length=USER_NAME_MAX_LENGTH)
+    surname = models.CharField(max_length=USER_SURNAME_MAX_LENGTH)
     avatar = models.ImageField(upload_to='avatars/', default='')
-    phone = models.CharField(max_length=12, default='')
+    phone = models.CharField(max_length=USER_PHONE_MAX_LENGTH, default='')
     github_url = models.URLField(blank=True)
-    about = models.TextField(blank=True, max_length=256)
+    about = models.TextField(blank=True, max_length=USER_ABOUT_MAX_LENGTH)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
