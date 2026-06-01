@@ -32,7 +32,7 @@ def project_detail_view(request, project_id):
 @login_required
 def create_project_view(request):
     form = ProjectForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
+    if form.is_valid():
         project = form.save(commit=False)
         project.owner = request.user
         project.save()
@@ -50,7 +50,7 @@ def edit_project_view(request, project_id):
     if request.user != project.owner:
         return redirect(f'/projects/{project_id}/')
     form = ProjectForm(request.POST or None, instance=project)
-    if request.method == 'POST' and form.is_valid():
+    if form.is_valid():
         form.save()
         return redirect(f'/projects/{project.id}/')
     return render(request, 'projects/create-project.html', {
