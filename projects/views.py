@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -64,7 +66,7 @@ def edit_project_view(request, project_id):
 def complete_project_view(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     if request.user != project.owner or project.status != PROJECT_STATUS_OPEN:
-        return JsonResponse({'status': 'error'}, status=403)
+        return JsonResponse({'status': 'error'}, status=HTTPStatus.FORBIDDEN)
     project.status = PROJECT_STATUS_CLOSED
     project.save()
     return JsonResponse({'status': 'ok', 'project_status': PROJECT_STATUS_CLOSED})
@@ -76,7 +78,7 @@ def toggle_participate_view(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     user = request.user
     if user == project.owner or project.status == PROJECT_STATUS_CLOSED:
-        return JsonResponse({'status': 'error'}, status=403)
+        return JsonResponse({'status': 'error'}, status=HTTPStatus.FORBIDDEN)
     if user in project.participants.all():
         project.participants.remove(user)
         participating = False
