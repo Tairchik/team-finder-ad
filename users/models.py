@@ -16,13 +16,9 @@ from core.constants import (
     USER_NAME_MAX_LENGTH,
     USER_PHONE_MAX_LENGTH,
     USER_SURNAME_MAX_LENGTH,
+    AVATAR_COLORS,
+    AVATAR_SIZE,
 )
-
-AVATAR_COLORS = [
-    '#5B8DEF', '#9B59B6', '#E67E22',
-    '#27AE60', '#E74C3C', '#16A085',
-    '#2980B9', '#8E44AD', '#D35400',
-]
 
 
 class UserManager(BaseUserManager):
@@ -74,7 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         super().save(*args, **kwargs)
 
     def _generate_avatar(self):
-        size = 100
+        size = AVATAR_SIZE
         color = random.choice(AVATAR_COLORS)
         letter = self.name[0].upper() if self.name else '?'
 
