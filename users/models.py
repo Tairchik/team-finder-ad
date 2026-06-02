@@ -4,7 +4,6 @@ from io import BytesIO
 
 from django.contrib.auth.models import (
     AbstractBaseUser,
-    BaseUserManager,
     PermissionsMixin,
 )
 from django.core.files.base import ContentFile
@@ -12,30 +11,19 @@ from django.db import models
 from PIL import Image, ImageDraw, ImageFont
 
 from core.constants import (
-    AVATAR_COLORS,
+    AVATAR_DEFAULT_FONT_PATH,
+    AVATAR_FONT_SIZE,
     AVATAR_SIZE,
+    AVATAR_TEXT_COLOR,
     USER_ABOUT_MAX_LENGTH,
     USER_NAME_MAX_LENGTH,
     USER_PHONE_MAX_LENGTH,
     USER_SURNAME_MAX_LENGTH,
+    AvatarColor,
 )
+from users.managers import UserManager
 
-
-class UserManager(BaseUserManager):
-    def create_user(self, email, name, surname, password=None, **extra_fields):
-        if not email:
-            raise ValueError('Email обязателен')
-        email = self.normalize_email(email)
-        user = self.model(email=email, name=name,
-                          surname=surname, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, name, surname, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, name, surname, password, **extra_fields)
+AVATAR_COLORS = [color.value for color in AvatarColor]
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -80,9 +68,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         # Пробуем загрузить шрифт, если нет — используем дефолтный
         try:
             font = ImageFont.truetype(
-                '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 48)
+                AVATAR_DEFAULT_FONT_PATH, AVATAR_FONT_SIZE)
         except Exception:
-            font = ImageFont.load_default()
+            try:
+                font = ImageFont.load_default(size=AVATAR_FONT_SIZE)
+            except TypeError:
+                font = ImageFont.load_default()
 
         # Центрируем букву
         bbox = draw.textbbox((0, 0), letter, font=font)
@@ -90,7 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         text_h = bbox[3] - bbox[1]
         x = (size - text_w) / 2 - bbox[0]
         y = (size - text_h) / 2 - bbox[1]
-        draw.text((x, y), letter, fill='white', font=font)
+        draw.text((x, y), letter, fill=AVATAR_TEXT_COLOR, font=font)
 
         buffer = BytesIO()
         img.save(buffer, format='PNG')
