@@ -14,7 +14,7 @@ def register_view(request):
     if form.is_valid():
         user = form.save()
         login(request, user)
-        return redirect('/projects/list/')
+        return redirect('projects:projects_list')
     return render(request, 'users/register.html', {'form': form})
 
 
@@ -23,13 +23,13 @@ def login_view(request):
     if form.is_valid():
         user = form.cleaned_data['user']
         login(request, user)
-        return redirect('/projects/list/')
+        return redirect('projects:projects_list')
     return render(request, 'users/login.html', {'form': form})
 
 
 def logout_view(request):
     logout(request)
-    return redirect('/projects/list/')
+    return redirect('projects:projects_list')
 
 
 def user_detail_view(request, user_id):
@@ -43,7 +43,7 @@ def edit_profile_view(request):
                            request.FILES or None, instance=request.user)
     if form.is_valid():
         form.save()
-        return redirect(f'/users/{request.user.id}/')
+        return redirect('users:user_detail', user_id=request.user.id)
     return render(request, 'users/edit_profile.html', {'form': form})
 
 
@@ -54,7 +54,7 @@ def change_password_view(request):
         form.save()
         # чтобы сессия не сбросилась после смены пароля
         login(request, request.user)
-        return redirect(f'/users/{request.user.id}/')
+        return redirect('users:user_detail', user_id=request.user.id)
     return render(request, 'users/change_password.html', {'form': form})
 
 
