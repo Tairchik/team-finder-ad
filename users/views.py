@@ -11,7 +11,7 @@ from users.models import User
 
 def register_view(request):
     form = RegisterForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
+    if form.is_valid():
         user = form.save()
         login(request, user)
         return redirect('/projects/list/')
@@ -20,7 +20,7 @@ def register_view(request):
 
 def login_view(request):
     form = LoginForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
+    if form.is_valid():
         user = form.cleaned_data['user']
         login(request, user)
         return redirect('/projects/list/')
@@ -41,7 +41,7 @@ def user_detail_view(request, user_id):
 def edit_profile_view(request):
     form = EditProfileForm(request.POST or None,
                            request.FILES or None, instance=request.user)
-    if request.method == 'POST' and form.is_valid():
+    if form.is_valid():
         form.save()
         return redirect(f'/users/{request.user.id}/')
     return render(request, 'users/edit_profile.html', {'form': form})
@@ -50,7 +50,7 @@ def edit_profile_view(request):
 @login_required
 def change_password_view(request):
     form = ChangePasswordForm(request.user, request.POST or None)
-    if request.method == 'POST' and form.is_valid():
+    if form.is_valid():
         form.save()
         # чтобы сессия не сбросилась после смены пароля
         login(request, request.user)
