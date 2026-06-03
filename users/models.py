@@ -70,10 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             font = ImageFont.truetype(
                 AVATAR_DEFAULT_FONT_PATH, AVATAR_FONT_SIZE)
         except Exception:
-            try:
-                font = ImageFont.load_default(size=AVATAR_FONT_SIZE)
-            except TypeError:
-                font = ImageFont.load_default()
+            font = ImageFont.load_default(size=AVATAR_FONT_SIZE)
 
         # Центрируем букву
         bbox = draw.textbbox((0, 0), letter, font=font)
