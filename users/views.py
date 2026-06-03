@@ -80,8 +80,6 @@ def participants_view(request):
             users_qs = User.objects.filter(
                 participated_projects__in=my_projects).distinct()
 
-    paginator = Paginator(users_qs, 12)
-    page_number = request.GET.get('page')
     page_obj = paginate(users_qs, USERS_PER_PAGE, request.GET.get('page'))
 
     query_prefix = f'filter={active_filter}&' if active_filter else ''
