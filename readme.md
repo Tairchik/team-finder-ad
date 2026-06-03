@@ -54,6 +54,7 @@ cp .env_example .env
 |------------|----------|
 | `DJANGO_SECRET_KEY` | Секретный ключ Django |
 | `DJANGO_DEBUG` | Режим отладки (`True` для разработки) |
+| `ALLOWED_HOSTS` | Список разрешенных хостов (доменов) через пробел (например, localhost 127.0.0.1 [::1]) |
 | `POSTGRES_DB` | Имя базы данных |
 | `POSTGRES_USER` | Пользователь PostgreSQL |
 | `POSTGRES_PASSWORD` | Пароль PostgreSQL |
